@@ -32,8 +32,8 @@ DiffDrive::DiffDrive() :
 //  v(0.0), w(0.0), // command velocities, in [m/s] and [rad/s]
   angular_velocity(0.0), linear_velocity(0.0), // command velocities, in [mm] and [mm/s]
   point_velocity(2,0.0), // command velocities, in [m/s] and [rad/s]
-  bias(0.49), // wheelbase, wheel_to_wheel, in [m]
-  wheel_radius(0.10), // radius of main wheel, in [m]
+  bias(0.45), // wheelbase, wheel_to_wheel, in [m]
+  wheel_radius(0.098), // radius of main wheel, in [m]
   tick_to_rad(0.0003925740f/2),//xbot1 8000tick/loop, xbot 32000tick/loop
   diff_drive_kinematics(bias, wheel_radius)
 {}
