@@ -18,6 +18,7 @@ add_message_files(DIRECTORY msg
                       InfraRed.msg
                       NaviState.msg
                       FaceResult.msg
+                      XbotPose.msg
                  )
 
 add_action_files(DIRECTORY action
