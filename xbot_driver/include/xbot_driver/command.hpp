@@ -41,7 +41,13 @@ public:
    */
   enum Name
   {
-    BaseControl = 3, Lift=4, TurnPlatformAndCamera = 5,Power = 1
+    Power = 1,
+    BaseControl = 2,
+    YawPlatform=3,
+    PitchPlatform = 4,
+    Sound = 5,
+    StateLed = 6,
+    Lift = 7
   };
 
 
@@ -60,7 +66,15 @@ public:
   struct Data
   {
     Data()
-      : command(BaseControl), speed(0.0), radius(0.0), lift_height(0), platform_angle(0), camera_angle(0), power_state(0)
+      : command(BaseControl),
+        speed(0.0),
+        radius(0.0),
+        lift_height(0),
+        yaw_platform_degree(0),
+        pitch_platform_degree(0),
+        power_state(0),
+        sound_state(0),sound_volume(100),
+        led(0)
     {
     }
 
@@ -70,8 +84,11 @@ public:
     float speed;
     float radius;
     unsigned char lift_height;
-    unsigned char platform_angle;
-    unsigned char camera_angle;
+    unsigned char yaw_platform_degree;
+    unsigned char pitch_platform_degree;
+    unsigned char led;
+    unsigned char sound_volume;
+    bool sound_state;
     bool power_state;
 
 
@@ -82,8 +99,17 @@ public:
 
   static Command SetVelocityControl(DiffDrive& diff_drive);
   static Command SetVelocityControl(const float &speed, const float &radius);
-  static Command SetLiftHeightControl(const unsigned char &lift_height);
-  static Command SetPlatformAndCameraControl(const unsigned char &platform_angle, const unsigned char &camera_angle);
+
+  static Command SetLiftControl(const unsigned char &lift_height);
+
+  static Command SetYawPlatformControl(const int &yaw_platform_degree);
+
+  static Command SetPitchPlatformControl(const int &pitch_platform_degree);
+
+  static Command SetSoundControl(const bool &sound_state);
+
+  static Command SetLedControl(const unsigned char &led);
+
   static Command SetPowerControl(const bool &power_state);
   Data data;
 

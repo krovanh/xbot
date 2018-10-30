@@ -11,6 +11,7 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
   std_msgs
+  xbot_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -199,3 +200,16 @@ include_directories(
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
+
+
+
+#############
+## kalman_filter #
+#############
+add_executable(kalman_filter src/kalman_filter.cpp)
+add_dependencies(kalman_filter xbot_tools_gencpp)
+target_link_libraries(kalman_filter ${catkin_LIBRARIES})
+
+install(TARGETS kalman_filter
+		  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)

@@ -66,10 +66,6 @@ void XbotRos::subscribeVelocityCommand(const geometry_msgs::TwistConstPtr msg)
 }
 
 
-
-
-
-
 /**
  * @brief Play a predefined sound (single sound or sound sequence)
  */
@@ -92,21 +88,35 @@ void XbotRos::subscribeResetOdometry(const std_msgs::EmptyConstPtr /* msg */)
   xbot.resetOdometry();
   return;
 }
-void XbotRos::subscribePowerCommand(const xbot_msgs::PowerConstPtr msg)
+void XbotRos::subscribeMotorEnableCommand(const std_msgs::Bool msg)
 {
-  xbot.setPowerControl(msg->power);
+  xbot.setPowerControl(!msg.data);
 
 }
 
-void XbotRos::subscribeLiftCommand(const xbot_msgs::LiftConstPtr msg)
+void XbotRos::subscribeLiftCommand(const std_msgs::UInt8 msg)
 {
-  xbot.setLiftControl(msg->height_percent);
+  xbot.setLiftControl(msg.data);
 }
 
-void XbotRos::subscribeCloudCameraCommand(const xbot_msgs::CloudCameraConstPtr msg)
+void XbotRos::subscribeYawPlatformCommand(const std_msgs::Int8 msg)
 {
 
-    xbot.setCloudCameraControl(msg->cloud_degree, msg->camera_degree);
+    xbot.setYawPlatformControl(msg.data);
+}
+void XbotRos::subscribePitchPlatformCommand(const std_msgs::Int8 msg)
+{
+  xbot.setPitchPlatformControl(msg.data);
+}
+void XbotRos::subscribeLedCommand(const std_msgs::UInt8 msg)
+{
+  xbot.setLedControl(msg.data);
+}
+
+void XbotRos::subscribeSoundCommand(const std_msgs::Bool msg)
+{
+  xbot.setSoundEnableControl(msg.data);
+
 }
 
 

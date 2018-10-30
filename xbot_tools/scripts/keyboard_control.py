@@ -1,13 +1,10 @@
 #!/usr/bin/env python
 #coding=utf-8
 """
-仿真时候的键盘控制
+键盘控制
 
-Copyright (c) 2016 Xu Zhihao (Howe).  All rights reserved.
+Copyright (c) 2018 WangPeng(Roc).  All rights reserved.
 
-This program is free software; you can redistribute it and/or modify
-
-This programm is tested on kuboki base turtlebot.
 
 """
 import rospy, sys, termios, tty

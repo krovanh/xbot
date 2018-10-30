@@ -4,19 +4,18 @@ find_package(catkin REQUIRED COMPONENTS std_msgs actionlib_msgs message_generati
 
 add_message_files(DIRECTORY msg
                       FILES 
-                      SensorState.msg
-                      DebugSensor.msg
-                      DockInfraRed.msg
+											CoreSensor.msg
+											ExtraSensor.msg
+											Echo.msg
+											InfraRed.msg
+											Imu.msg
+											RawImu.msg
+											Battery.msg
                       KeyboardInput.msg
-                      CloudCamera.msg
                       XbotState.msg
-                      Lift.msg
-                      Power.msg
-                      ImuNine.msg
-                      ImuYRP.msg
-                      Echos.msg
-                      InfraRed.msg
                       NaviState.msg
+                      FaceResult.msg
+                      XbotPose.msg
                  )
 
 add_action_files(DIRECTORY action

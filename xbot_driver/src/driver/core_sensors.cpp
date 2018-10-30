@@ -56,159 +56,83 @@ bool CoreSensors::deserialise(ecl::PushAndPop<unsigned char> & byteStream)
 //    std::cout << "bytestream.size:"<<byteStream.size()<<std::endl<<"xbot_node: xbot_default: deserialise failed. not enough byte stream." << std::endl;
 //    return false;
 //  }
-  unsigned char data_type;//0x10 marker
-  buildVariable(data_type, byteStream);
+//  标志位，固定0x10
+  unsigned char header_id;//0x10 marker
+  buildVariable(header_id, byteStream);
 
+  if( header_id != Header::CoreSensors )
+  {
+      std::cout<<"header_id is wrong. header_id:"<<(unsigned int)header_id<<std::endl;
+
+      return false;
+  }
 //  std::cout<<"header_id:"<<(unsigned int)header_id<<std::endl;
-  unsigned char power_num;//0x01 num of power
-  buildVariable(power_num, byteStream);
-//  std::cout<<"power_num:"<<(unsigned int)power_num<<std::endl;
+
   uint16_t tempvariable = 0;
+  uint8_t tmp = 0;
+//  码盘
+  buildVariable(data.left_encoder, byteStream);
+  buildVariable(data.right_encoder, byteStream);
 
-  buildVariable(tempvariable,byteStream);
-  data.battery_voltage = tempvariable/100.0;
-//  std::cout<<"power_voltage:"<<data.power_voltage<<std::endl;
-  unsigned char infred_num;//0x08
-  buildVariable(infred_num, byteStream);
-//clockwise direction, the left or right is based on the robot face
-  buildVariable(tempvariable,byteStream);
-  queue_rear_left_infrared.lpush(tempvariable);
-  data.rear_left_infred = queue_rear_left_infrared.mean();
+//  电源，充电状态与电量
 
-  buildVariable(tempvariable,byteStream);
-  queue_rear_center_infrared.lpush(tempvariable);
-  data.rear_center_infred = queue_rear_center_infrared.mean();
+  buildVariable(tempvariable, byteStream);//充电电流，单位10mA
 
-  buildVariable(tempvariable,byteStream);
-  queue_rear_right_infrared.lpush(tempvariable);
-  data.rear_right_infred = queue_rear_right_infrared.mean();
-
-  buildVariable(tempvariable,byteStream);
-  queue_front_left_infrared.lpush(tempvariable);
-  data.front_left_infred = queue_front_left_infrared.mean();
-
-  buildVariable(tempvariable,byteStream);
-  queue_front_center_infrared.lpush(tempvariable);
-  data.front_center_infred = queue_front_center_infrared.mean();
-
-  buildVariable(tempvariable,byteStream);
-  queue_front_right_infrared.lpush(tempvariable);
-  data.front_right_infred = queue_front_right_infrared.mean();
-
-  buildVariable(tempvariable,byteStream);
-  queue_dock_left_infrared.lpush(tempvariable);
-  data.dock_left_infred = queue_dock_left_infrared.mean();
-
-  buildVariable(tempvariable,byteStream);
-  queue_dock_left_infrared.lpush(tempvariable);
-  data.dock_left_infred = queue_dock_left_infrared.mean();
-//  std::cout<<"rear_center_infred:"<<data.rear_center_infred<<std::endl;
-
-  unsigned char current_num;//0x05
-  buildVariable(current_num,byteStream);
-
-  buildVariable(tempvariable,byteStream);
-  data.front_left_current = tempvariable/100.0;
-
-  buildVariable(tempvariable,byteStream);
-  data.front_right_current = tempvariable/100.0;
-
-  buildVariable(tempvariable,byteStream);
-  data.rear_left_current = tempvariable/100.0;
-
-  buildVariable(tempvariable,byteStream);
-  data.rear_right_current = tempvariable/100.0;
-
-  buildVariable(tempvariable,byteStream);
-  data.up_down_current = tempvariable/100.0;
-
-  unsigned char echo_num;//0x06
-  buildVariable(echo_num,byteStream);
-//clockwise direction, the left or right is based on the robot face
-
-//  rear right
-  buildVariable(tempvariable,byteStream);
-
-  queue_rear_right_echo.lpush(tempvariable);
-
-  data.rear_right_echo = queue_rear_right_echo.mean();
-
-//  rear center
-  buildVariable(tempvariable,byteStream);
-
-  queue_rear_center_echo.lpush(tempvariable);
-
-  data.rear_center_echo = queue_rear_center_echo.mean();
-
-//  rear left
-  buildVariable(tempvariable,byteStream);
-
-  queue_rear_left_echo.lpush(tempvariable);
-
-  data.rear_left_echo = queue_rear_left_echo.mean();
-
-//  front left
-  buildVariable(tempvariable,byteStream);
-
-  queue_front_left_echo.lpush(tempvariable);
-
-  data.front_left_echo = queue_front_left_echo.mean();
+  data.is_charging = (tempvariable < 0)?false:true;
+  buildVariable(data.power_percent,byteStream);
 
 
-//  front center
-  buildVariable(tempvariable,byteStream);
 
-  queue_front_center_echo.lpush(tempvariable);
+//  前置三路超声，均值滤波，25个邻域数据取均值，每秒50帧数据，取0.5s内的平均
 
-  data.front_center_echo = queue_front_center_echo.mean();
+  buildVariable(tempvariable, byteStream);
+  queue_left_echo.lpush(tempvariable);
+  data.left_echo = queue_left_echo.mean();
 
-//  front right
-  buildVariable(tempvariable,byteStream);
+  buildVariable(tempvariable, byteStream);
+  queue_center_echo.lpush(tempvariable);
+  data.center_echo = queue_center_echo.mean();
 
-  queue_front_right_echo.lpush(tempvariable);
+  buildVariable(tempvariable, byteStream);
+  queue_right_echo.lpush(tempvariable);
+  data.right_echo = queue_right_echo.mean();
 
-  data.front_right_echo = queue_front_right_echo.mean();
+  buildVariable(tempvariable, byteStream);//rear_left not used
+  buildVariable(tempvariable, byteStream);//rear_center not used
+  buildVariable(tempvariable, byteStream);//rear_right not used
 
-//  std::cout<<"front_center_echo:"<<data.front_center_echo<<std::endl;
-  unsigned char encoder_num;
-  buildVariable(encoder_num, byteStream);
-  buildVariable(data.front_left_encoder, byteStream);
-//  std::cout<<"front_left:"<<data.front_left_encoder<<std::endl;
-  buildVariable(data.front_right_encoder, byteStream);
-//  std::cout<<"front_right:"<<data.front_right_encoder<<std::endl;
-  buildVariable(data.rear_left_encoder, byteStream);
-  buildVariable(data.rear_right_encoder, byteStream);
-  buildVariable(data.up_down_encoder, byteStream);
+//  前后各一路红外，均值滤波，25个邻域数据取均值，每秒50帧数据，取0.5s内的平均
+  buildVariable(tempvariable, byteStream);//front left not used
 
-  unsigned char imu_num;
-  buildVariable(imu_num, byteStream);
-  buildVariable(data.acce_x, byteStream);
-  buildVariable(data.acce_y, byteStream);
-  buildVariable(data.acce_z, byteStream);
-  buildVariable(data.gyro_x, byteStream);
-  buildVariable(data.gyro_y, byteStream);
-  buildVariable(data.gyro_z, byteStream);
-  buildVariable(data.mag_x, byteStream);
-  buildVariable(data.mag_y, byteStream);
-  buildVariable(data.mag_z, byteStream);
-  buildVariable(data.pressure, byteStream);
-  buildVariable(data.yaw,byteStream);
-  buildVariable(data.pitch, byteStream);
-  buildVariable(data.roll, byteStream);
+  buildVariable(tempvariable, byteStream);
+  queue_front_infrared.lpush(tempvariable);
+  data.front_infrared = queue_front_infrared.mean();
+
+  buildVariable(tempvariable, byteStream);//front right not used
+  buildVariable(tempvariable, byteStream);//rear left not used
+
+  buildVariable(tempvariable, byteStream);
+  queue_rear_infrared.lpush(tempvariable);
+  data.rear_infrared = queue_rear_infrared.mean();
+
+  buildVariable(tempvariable, byteStream);//rear right not used
+
+
+//  急停开关状态反馈
+  buildVariable(tmp,byteStream);
+  data.stop_button_state = (tmp == 0)?true:false;
+
+//  两路电机电流
+  buildVariable(data.left_motor_current, byteStream);
+  buildVariable(data.right_motor_current, byteStream);
+
+//  时间戳，0~65536,单位us
   buildVariable(data.timestamp, byteStream);
 
-  std::cout<<"timestamp:"<<data.timestamp<<std::endl;
-//  unsigned short x=3;
-//  unsigned short y=65500;
-//  unsigned short result=x-y;
-
-//  std::cout<<"sizeof timestamp:"<<result<<std::endl;
+//  故障状态显示
+  buildVariable(data.error_state, byteStream);
 
 
-//  std::cout<<"time:"<<time(0)<<"|left_encoder:"<<data.left_encoder<<std::endl;
-
-
-//  std::cout<<"power:"<<data.power_voltage<<"|Echo1:"<<data.echo_1<<"|Echo2:"<<data.echo_2<<"|Echo3:"<<data.echo_3<<"|Echo4:"<<data.echo_4<<std::endl;
   return true;
 }
 
