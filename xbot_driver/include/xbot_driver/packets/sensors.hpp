@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file include/xbot_driver/packets/core_sensors.hpp
  *
  * @brief Imu sensor packet payloads.
@@ -40,7 +40,7 @@ public:
   struct Data {
     unsigned char yaw_platform_degree;
     unsigned char pitch_platform_degree;
-    unsigned char sound_status;
+    bool sound_status;
     float acc_x;
     float acc_y;
     float acc_z;
@@ -59,7 +59,8 @@ public:
     float q3;
     float q4;
     unsigned char error_status;
-    unsigned short timestamp;
+    uint32_t timestamp;
+    uint8_t version;
 
 
   } data;

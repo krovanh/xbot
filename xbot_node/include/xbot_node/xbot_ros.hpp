@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (c) 2012, Yujin Robot.
  * All rights reserved.
  *
@@ -61,7 +61,7 @@
 #include <sensor_msgs/Imu.h>
 
 #include <ecl/sigslots.hpp>
-
+#include <ecl/threads.hpp>
 #include <xbot_msgs/CoreSensor.h>
 #include <xbot_msgs/ExtraSensor.h>
 #include <xbot_msgs/Echo.h>
@@ -71,10 +71,13 @@
 
 #include <xbot_driver/xbot.hpp>
 #include <xbot_msgs/XbotState.h>
-#include <xbot_msgs/Imu.h>
 #include <xbot_msgs/RawImu.h>
 
+#include <geometry_msgs/Quaternion.h>
 #include "odometry.hpp"
+
+
+#include <xbot_talker/play.h>
 
 /*****************************************************************************
  ** Namespaces
@@ -89,6 +92,7 @@ public:
   ~XbotRos();
   bool init(ros::NodeHandle& nh);
   bool update();
+  void call_srv();
 
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 private:
@@ -104,6 +108,10 @@ private:
   bool sensor_serial_timed_out_;
 
   bool led_indicate_battery;
+  bool announced_battery;
+  ros::ServiceClient srv_play;
+  ecl::Thread client_thread;
+
 
   /*********************
    ** Ros Publishers

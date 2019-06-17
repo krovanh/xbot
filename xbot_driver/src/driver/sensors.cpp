@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file /xbot_driver/src/driver/imu_sensors.cpp
  *
  * @brief Implementation of the imu sensor packet data.
@@ -65,22 +65,40 @@ bool Sensors::deserialise(ecl::PushAndPop<unsigned char> & byteStream)
   buildVariable(data.yaw_platform_degree, byteStream);
 //  竖直转台角度
   buildVariable(data.pitch_platform_degree, byteStream);
-//  音量控制
+//  音频状态
   buildVariable(data.sound_status, byteStream);
-//  IMU9250九轴裸数据
-  buildVariable(data.acc_x, byteStream);
-  buildVariable(data.acc_y, byteStream);
-  buildVariable(data.acc_z, byteStream);
-  buildVariable(data.gyro_x, byteStream);
-  buildVariable(data.gyro_y, byteStream);
-  buildVariable(data.gyro_z, byteStream);
-  buildVariable(data.mag_x, byteStream);
-  buildVariable(data.mag_y, byteStream);
-  buildVariable(data.mag_z, byteStream);
+
+
+//  IMU9250九轴裸数据,由于老版本的电路板9250芯片向下，因此z轴y轴都为反向
+  //master 分支下都是已经修正了电路板芯片朝向问题，因此去除imudown的负号
+  uint16_t tmp;
+  buildVariable(tmp, byteStream);
+  data.acc_x = tmp*0.00006086*9.8;
+  buildVariable(tmp, byteStream);
+  data.acc_y = tmp*0.00006086*9.8;
+  buildVariable(tmp, byteStream);
+  data.acc_z = (tmp*0.00006086-1)*9.8;
+  buildVariable(tmp, byteStream);
+  data.gyro_x = tmp*4*0.0152139846947314*3.1415926/180;
+  buildVariable(tmp, byteStream);
+  data.gyro_y = tmp*4*0.0152139846947314*3.1415926/180;
+  buildVariable(tmp, byteStream);
+  data.gyro_z = tmp*4*0.0152139846947314*3.1415926/180;
+
+
+  buildVariable(tmp, byteStream);
+  data.mag_x = tmp*0.15;
+  buildVariable(tmp, byteStream);
+  data.mag_y = tmp*0.15;
+  buildVariable(tmp, byteStream);
+  data.mag_z = tmp*0.15;
 
 //  IMU9250计算出的三轴角度
+
   buildVariable(data.yaw,byteStream);
+  data.yaw = -data.yaw;
   buildVariable(data.pitch, byteStream);
+  data.pitch = -data.pitch;
   buildVariable(data.roll, byteStream);
 //  IMU9250计算出的四元数
   buildVariable(data.q1, byteStream);
@@ -90,8 +108,12 @@ bool Sensors::deserialise(ecl::PushAndPop<unsigned char> & byteStream)
 
 //  舵机故障状态
   buildVariable(data.error_status, byteStream);
-//  时间戳，0~65536，单位us
+
+//  时间戳，4字节无符号整形，单位us
   buildVariable(data.timestamp, byteStream);
+
+  //软件版本
+  buildVariable(data.version,byteStream);
 
   return true;
 }

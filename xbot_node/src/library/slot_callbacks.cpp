@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (c) 2012, Yujin Robot.
  * All rights reserved.
  *
@@ -100,9 +100,8 @@ void XbotRos::publishCoreSensor()
       core_sensor.right_encoder = data.right_encoder;
       core_sensor.battery_percent = data.power_percent;
       core_sensor.ischarging = data.is_charging;
-      core_sensor.left_echo = data.left_echo;
-      core_sensor.center_echo = data.center_echo;
-      core_sensor.right_echo = data.right_echo;
+      core_sensor.front_echo = data.front_echo;
+      core_sensor.rear_echo = data.rear_echo;
       core_sensor.front_infrared = data.front_infrared;
       core_sensor.rear_infrared = data.rear_infrared;
       core_sensor.error_state = data.error_state;
@@ -110,6 +109,7 @@ void XbotRos::publishCoreSensor()
       core_sensor.right_motor_current = data.right_motor_current;
       core_sensor.motor_disabled = data.stop_button_state;
       core_sensor.time_stamp = data.timestamp;
+      core_sensor.version = data.version;
 
       core_sensor_publisher.publish(core_sensor);
 
@@ -129,12 +129,10 @@ void XbotRos::publishEchoData()
       CoreSensors::Data data_echo = xbot.getCoreSensorData();
       msg.header.frame_id = "echo_link";
       msg.header.stamp = ros::Time::now();
-      msg.left = data_echo.left_echo;
-      msg.center = data_echo.center_echo;
-      msg.right = data_echo.right_echo;
-      msg.left_near = (data_echo.left_echo<1600);
-      msg.center_near = (data_echo.center_echo<1600);
-      msg.right_near = (data_echo.right_echo<1600);
+      msg.front = data_echo.front_echo;
+      msg.rear = data_echo.rear_echo;
+      msg.front_near = (data_echo.front_echo<1600);
+      msg.rear_near = (data_echo.rear_echo<1600);
       echo_data_publisher.publish(msg);
 
     }
@@ -200,6 +198,16 @@ void XbotRos::publishBatteryState()
         xbot.setLedControl(leds);
       }
 
+      if(!announced_battery)
+      {
+
+        client_thread.start(&XbotRos::call_srv, *this);
+
+        announced_battery = true;
+
+
+      }
+
 
 
 //    }
@@ -221,6 +229,7 @@ void XbotRos::publishRobotState()
         msg.echo_plug_error = core_data.error_state;
         msg.infrared_plug_error = core_data.error_state;
         msg.motor_error = core_data.error_state;
+        msg.version = core_data.version;
 
 
         robot_state_publisher.publish(msg);
@@ -272,6 +281,7 @@ void XbotRos::publishExtraSensor()
       extra_sensor.q4 = data.q4;
       extra_sensor.error_state = data.error_status;
       extra_sensor.time_stamp = data.timestamp;
+      extra_sensor.version = data.version;
       extra_sensor_publisher.publish(extra_sensor);
 
 
@@ -283,23 +293,34 @@ void XbotRos::publishExtraSensor()
 void XbotRos::publishInertia()
 {
   if ( ros::ok() ) {
-    if (imu_data_publisher.getNumSubscribers() > 0) {
-      xbot_msgs::Imu imu_msg;
 
-      Sensors::Data data = xbot.getExtraSensorsData();
+    sensor_msgs::Imu imu_msg;
 
-      imu_msg.header.stamp = ros::Time::now();
-      imu_msg.yaw = data.yaw;
-      imu_msg.pitch = data.pitch;
-      imu_msg.roll = data.roll;
-      imu_msg.q1 = data.q1;
-      imu_msg.q2 = data.q2;
-      imu_msg.q3 = data.q3;
-      imu_msg.q4 = data.q4;
-      imu_data_publisher.publish(imu_msg);
+    Sensors::Data data = xbot.getExtraSensorsData();
+    imu_msg.header.stamp = ros::Time::now();
+    imu_msg.header.frame_id = "imu_link";
+    imu_msg.orientation = tf::createQuaternionMsgFromYaw(-xbot.getHeading());
+    imu_msg.orientation_covariance[0] = 10.01;
+    imu_msg.orientation_covariance[4] = 10.01;
+    imu_msg.orientation_covariance[8] = 10.01;
+
+    imu_msg.angular_velocity.x = data.gyro_x;
+    imu_msg.angular_velocity.y = data.gyro_y;
+    imu_msg.angular_velocity.z = data.gyro_z;
+    imu_msg.angular_velocity_covariance[0] = 10.01;
+    imu_msg.angular_velocity_covariance[4] = 10.01;
+    imu_msg.angular_velocity_covariance[8] = 10.01;
+
+    imu_msg.linear_acceleration.x = data.acc_x;
+    imu_msg.linear_acceleration.y = data.acc_y;
+    imu_msg.linear_acceleration.z = data.acc_z;
+    imu_msg.linear_acceleration_covariance[0] = 0.01;
+    imu_msg.linear_acceleration_covariance[4] = 0.01;
+    imu_msg.linear_acceleration_covariance[8] = 0.01;
+
+    imu_data_publisher.publish(imu_msg);
 
 
-    }
   }
 }
 
