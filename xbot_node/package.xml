@@ -7,7 +7,7 @@
   <author>Roc</author>
   <author>wangpeng@droid.ac.cn</author>
   <maintainer email="wangpeng@droid.ac.cn">Roc</maintainer>
-  <license>LGPL</license>  
+  <license>BSD</license>  
   <url type="website">http://ros.org/wiki/xbot_node</url>
 
   <buildtool_depend>catkin</buildtool_depend>
