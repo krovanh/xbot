@@ -1,0 +1,11 @@
+
+file(GLOB SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.cpp)
+
+
+add_library(xbot ${SOURCES} ${VERSION_FILE})
+target_link_libraries(xbot ${catkin_LIBRARIES})
+
+install(TARGETS xbot
+        DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+)
+
